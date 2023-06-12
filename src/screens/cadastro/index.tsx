@@ -21,7 +21,7 @@ export default function CadastroScreen() {
   const auth = getAuth();
   const db = getFirestore();
 
-  const manipularCadastro = async ({email, senha, confirmarSenha}:any) => {
+  const manipularCadastro = async ({email, senha, confirmarSenha, cpf}:any) => {
     if (senha !== confirmarSenha) {
       Alert.alert('confirmarSenha', 'Senhas diferentes');
       return;
@@ -30,13 +30,17 @@ export default function CadastroScreen() {
       Alert.alert('senha', 'A senha deve ter pelo menos 6 dígitos');
       return;
     }
+    else if (cpf.length < 11) {
+      Alert.alert('cpf', 'CPF incorreto');
+      return;
+    }
     
     else {
-      await createUserWithEmailAndPassword(auth, email, senha)
+      await createUserWithEmailAndPassword(auth, email, senha, cpf)
       .then((usuario) => {
 
           setDoc(doc(db, 'usuarios', usuario.user.uid), {
-            email, senha
+            email, senha, cpf
           })
           navigation.navigate('LoginScreen')
       }).catch(erro => Alert.alert('Erro', 'Não foi possivel criar o usuário, tente novamente'))}    
@@ -47,7 +51,7 @@ export default function CadastroScreen() {
     <View style={styles.container}>
       <View style={styles.background} />
       <Text style={styles.title}>cadastro cliente</Text>
-      <Formik initialValues={{ email: '', confirmarEmail: '', senha: '', confirmarSenha: '' }} onSubmit={manipularCadastro}>
+      <Formik initialValues={{ email: '', cpf: '', senha: '', confirmarSenha: '' }} onSubmit={manipularCadastro}>
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
           
           <View style={styles.formContainer}>
@@ -58,9 +62,9 @@ export default function CadastroScreen() {
             </View>
             
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Confirmar e-mail" onChangeText={handleChange('confirmarEmail')} 
-              onBlur={handleBlur('confirmarEmail')}value={values.confirmarEmail}/>
-              {errors.confirmarEmail && touched.confirmarEmail && <Text style={styles.errorText}>{errors.confirmarEmail}</Text>}
+              <TextInput style={styles.input} placeholder="Digite seu CPF" onChangeText={handleChange('cpf')} 
+              onBlur={handleBlur('cpf')}value={values.cpf}/>
+              {errors.cpf && touched.cpf && <Text style={styles.errorText}>{errors.CPF}</Text>}
             </View>
             
             <View style={styles.inputContainer}>
